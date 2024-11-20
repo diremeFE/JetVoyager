@@ -12,9 +12,19 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.show');
+    // Ruta para mostrar el perfil (ver detalles del perfil)
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    
+    // Ruta para editar el perfil
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    
+    // Ruta para actualizar el perfil
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    
+    // Ruta para eliminar el perfil
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+
 
 require __DIR__.'/auth.php';

@@ -21,6 +21,16 @@ class ProfileController extends Controller
         ]);
     }
 
+    public function show(Request $request): View
+    {
+        // Obtiene los datos del usuario autenticado
+        $user = $request->user();
+        
+        // Devuelve la vista del perfil, pasando los datos del usuario
+        return view('profile.show', compact('user'));
+    }
+
+
     /**
      * Update the user's profile information.
      */
