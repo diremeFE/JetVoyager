@@ -1,4 +1,4 @@
-<div class="{{ $class ?? '' }} relative h-80 p-2 shadow-lg rounded-3xl overflow-hidden transition-transform duration-300 ease-in-out hover:scale-105"
+<div class="{{ $class ?? '' }} relative h-80 p-2 shadow-lg rounded-3xl overflow-hidden transition-transform duration-300 ease-in-out hover:scale-95"
      style="background-image: url('{{ $imagenURL ?? asset('storage/images/default.jpg') }}'); background-size: cover; background-position: center;">
     <!-- Capa de opacidad -->
     <div class="absolute inset-0 bg-black bg-opacity-40"></div>
@@ -10,8 +10,9 @@
         <!-- Descripción del destino -->
         <p class="text-sm">{{ $descripcion ?? 'Sin descripción disponible.' }}</p>
 
+        <!-- Botón con width ajustado al texto -->
         <button
-            class="mt-5 bg-yellow text-black font-semibold px-4 py-2 rounded-full flex items-center justify-center space-x-2 hover:bg-yellow-500 transition duration-300">
+            class="w-[200px] mt-5 bg-yellow text-black font-semibold px-4 py-2 rounded-full flex items-center justify-center space-x-2 hover:bg-yellow-500 transition duration-300">
             <span>Reservar vuelo</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
