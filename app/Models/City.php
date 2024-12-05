@@ -16,4 +16,10 @@ class City extends Model
     {
         return $this->hasMany(Airport::class);
     }
+
+    // Relación con los destinos populares (una ciudad tiene muchos destinos populares)
+    public function popularDestinations()
+    {
+        return $this->hasMany(PopularDestination::class);
+    }
 }

@@ -2,14 +2,14 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReservaController;
-use App\Http\Controllers\DestinosPopularesController;
+use App\Http\Controllers\PopularDestinationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FlightController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\AirportController;
 
-Route::get('/', [DestinosPopularesController::class, 'index']); // Ruta para la vista de destinos populares
+Route::get('/', [PopularDestinationController::class, 'index']);
 
 
 Route::get('/dashboard', function () {
@@ -22,6 +22,13 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::get('/admin/popular-destinations/create', [PopularDestinationController::class, 'create'])->name('popular-destinations.create');
+Route::post('/admin/popular-destinations', [PopularDestinationController::class, 'store'])->name('popular-destinations.store');
+Route::get('popular-destinations', [PopularDestinationController::class, 'indexAll'])->name('popular-destinations.indexAll');
+Route::get('/popular-destinations/{city_id}', [PopularDestinationController::class, 'show'])->name('popular-destinations.show');
+
+
 
 Route::resource('users', UserController::class);
 Route::resource('flights', FlightController::class);

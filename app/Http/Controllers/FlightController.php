@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Flight;
+use App\Models\City;
 use Illuminate\Http\Request;
 
 class FlightController extends Controller
@@ -83,24 +84,38 @@ class FlightController extends Controller
     }
 
     // FlightController.php
-public function getArrivals($airportId)
-{
-    // Suponiendo que tienes un modelo Flight que se conecta con la tabla 'flights'
-    $arrivals = Flight::where('destination_airport_id', $airportId)->get();
+    public function getArrivals($airportId)
+    {
+        // Suponiendo que tienes un modelo Flight que se conecta con la tabla 'flights'
+        $arrivals = Flight::where('destination_airport_id', $airportId)->get();
 
-    // Devolver los vuelos que llegan
-    return response()->json($arrivals);
-}
+        // Devolver los vuelos que llegan
+        return response()->json($arrivals);
+    }
 
 
-// FlightController.php
-public function getDepartures($airportId)
-{
-    // Suponiendo que tienes un modelo Flight que se conecta con la tabla 'flights'
-    $departures = Flight::where('origin_airport_id', $airportId)->get();
+    // FlightController.php
+    public function getDepartures($airportId)
+    {
+        // Suponiendo que tienes un modelo Flight que se conecta con la tabla 'flights'
+        $departures = Flight::where('origin_airport_id', $airportId)->get();
 
-    // Devolver los vuelos que salen
-    return response()->json($departures);
-}
+        // Devolver los vuelos que salen
+        return response()->json($departures);
+    }
+
+    public function getFlightsByCity($cityId)
+    {
+        // Obtener la ciudad
+        $city = City::findOrFail($cityId);
+        
+        // Obtener los vuelos asociados a los aeropuertos de la ciudad
+        $flights = $city->airports()->with('flights')->get()->flatMap(function ($airport) {
+            return $airport->flights; // Obtener todos los vuelos de los aeropuertos
+        });
+
+        // Devolver los vuelos en formato JSON
+        return response()->json($flights);
+    }
 
 }

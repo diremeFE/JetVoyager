@@ -16,15 +16,23 @@
 
     <!-- OFERTAS ESPECIALES A DESTINOS POPULARES -->
     <section class="p-6 flex flex-col max-w-7xl mx-auto">
-        <h2 class="text-4xl font-semibold mb-9">Ofertas a destinos populares</h2>
+        <div class="flex justify-between">
+            <h2 class="text-4xl font-semibold mb-9">Ofertas a destinos populares</h2>
+            <a href="popular-destinations" class="font-medium flex">Ver todos
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
+        </div>
         <div class="grid grid-cols-12 gap-4">
             @foreach ($destinos as $destino)
-                <x-popular-destinations class="col-span-12 md:col-span-6 xl:col-span-4" :imagenURL="asset('storage/images/popular-destinations-cards/' . ($destino->imagen ?? 'default.jpg'))" :destino="$destino"
-                    :descripcion="$destino->descripcion . ' ' . $destino->precio . ' $'" />
+                <x-popular-destinations class="col-span-12 md:col-span-6 xl:col-span-4" :imagenURL="asset('storage/images/popular-destinations-cards/' . ($destino->imagen ?? 'default.jpg'))"
+                    :destino="$destino->city->name" :descripcion="$destino->descripcion" :id="$destino->city_id" />
             @endforeach
+
         </div>
     </section>
-
 
 
     <section class="p-6 flex flex-col max-w-7xl mx-auto">

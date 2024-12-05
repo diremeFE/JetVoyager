@@ -27,4 +27,11 @@ class Flight extends Model
     {
         return $this->belongsTo(Airport::class, 'destination_airport_id');
     }
+
+    // Relación con los destinos populares (un vuelo tiene muchos destinos populares)
+    public function popularDestinations()
+    {
+        return $this->hasMany(PopularDestination::class);
+    }
 }
+

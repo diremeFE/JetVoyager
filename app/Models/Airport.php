@@ -32,4 +32,14 @@ class Airport extends Model
     {
         return $this->hasMany(Flight::class, 'destination_airport_id');
     }
+
+    public function flights()
+{
+    return $this->hasMany(Flight::class, 'origin_airport_id'); // Relación con vuelos de salida
+}
+
+public function flightsAsDestination()
+{
+    return $this->hasMany(Flight::class, 'destination_airport_id');
+}
 }
