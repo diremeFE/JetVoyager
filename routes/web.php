@@ -9,7 +9,7 @@ use App\Http\Controllers\FlightController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\AirportController;
 
-Route::get('/', [PopularDestinationController::class, 'index']);
+Route::get('/', action: [PopularDestinationController::class, 'index']);
 
 
 Route::get('/dashboard', function () {

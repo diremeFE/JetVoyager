@@ -1,11 +1,17 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-7xl mx-auto p-6">
-    <h1 class="text-4xl font-semibold mb-6">{{ $destino->city->name }}</h1>
-    <p class="text-lg">{{ $destino->descripcion }}</p>
+<h1>Destino: {{ $destino->city->name }}</h1>
+<p>Descripción: {{ $destino->descripcion }}</p>
 
-    <img src="{{ asset('storage/images/popular-destinations-cards/' . ($destino->imagen ?? 'default.jpg')) }}" 
-         alt="{{ $destino->city->name }}" class="mt-6 rounded-lg shadow-md">
-</div>
+<h2>Aeropuertos:</h2>
+<p>Origen: {{ $origenAirport->name }} - {{ $origenAirport->city->name }}</p>
+<p>Destino: {{ $destinoAirport->name }} - {{ $destinoAirport->city->name }}</p>
+
+<h2>Vuelos Disponibles:</h2>
+<ul>
+    @foreach($vuelos as $vuelo)
+        <li>{{ $vuelo->flight_number }} - {{ $vuelo->departure_time }}</li>
+    @endforeach
+</ul>
 @endsection
