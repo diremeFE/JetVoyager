@@ -7,8 +7,26 @@ use Illuminate\Database\Eloquent\Model;
 class Flight extends Model
 {
     protected $fillable = [
-        'airplane_id', 'origin_airport_id', 'destination_airport_id',
-        'departure_time', 'arrival_time', 'base_price', 'status',
+        'airplane_id',
+        'origin_airport_id',
+        'destination_airport_id',
+        'flight_date',
+        'departure_time',
+        'arrival_time',
+        'total_duration',
+        'stopovers_count',
+        'stopover_cities',
+        'base_price',
+        'status',
+        'flight_number',
+    ];
+
+    protected $casts = [
+        'flight_date' => 'date',
+        'departure_time' => 'datetime',
+        'arrival_time' => 'datetime',
+        'total_duration' => 'interval',
+        'stopover_cities' => 'array',
     ];
 
     public function tickets()

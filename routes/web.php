@@ -27,6 +27,8 @@ Route::get('/admin/popular-destinations/create', [PopularDestinationController::
 Route::post('/admin/popular-destinations', [PopularDestinationController::class, 'store'])->name('popular-destinations.store');
 Route::get('popular-destinations', [PopularDestinationController::class, 'indexAll'])->name('popular-destinations.indexAll');
 Route::get('/popular-destinations/{city_id}', [PopularDestinationController::class, 'show'])->name('popular-destinations.show');
+Route::get('/vuelos/{fecha}', [PopularDestinationController::class, 'mostrarVuelos']);
+Route::get('/vuelo/{flight_id}', [FlightController::class, 'show'])->name('flight.show');
 
 
 

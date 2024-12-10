@@ -20,6 +20,7 @@ export default {
             colors: {
                 'general' : '#F6F6F7',
                 'yellow': '#F6DE00',
+                'yellow-hover': '#E6CF00',
                 'primary-black': '#1D223F',
                 'gray-footer': '#A8A8A8'
               },

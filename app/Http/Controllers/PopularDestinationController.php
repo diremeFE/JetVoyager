@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PopularDestination;
 use App\Models\City;
+use App\Models\Flight;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -47,85 +48,122 @@ class PopularDestinationController extends Controller
      * Mostrar un destino popular específico.
      */
 
-public function show($city_id)
-{
-    // Registrar el ID de la ciudad para depuración
-    Log::info("Intentando obtener el destino con city_id: {$city_id}");
+    public function show($city_id)
+    {
+        // Obtener la ciudad destino por city_id
+        $destino = PopularDestination::with('city')->where('city_id', $city_id)->first();
 
-    // Obtener la ciudad destino por city_id
-    $destino = PopularDestination::with('city')->where('city_id', $city_id)->first();
+        if (!$destino) {
+            return redirect('/')->with('error', 'Destino no encontrado.');
+        }
 
-    if (!$destino) {
-        // Registrar que no se encontró el destino
-        Log::warning("No se encontró el destino para city_id: {$city_id}");
-        
-        // Si no se encuentra el destino, retornar un mensaje o redirigir a la ruta /
-        return redirect('/')->with('error', 'Destino no encontrado.');
+        $ip = request()->ip();
+        Log::info("IP del usuario: {$ip}");
+
+        // Simular IP local
+        if ($ip == '127.0.0.1') {
+            $origen = 'Valencia';
+            Log::info("Simulando IP local. Ciudad de origen: {$origen}");
+        } else {
+            $url = "http://ip-api.com/json/{$ip}";
+            $response = file_get_contents($url);
+            Log::info("Respuesta de la API de geolocalización: {$response}");
+            $data = json_decode($response);
+            $origen = $data->city ?? 'Desconocida';
+            Log::info("Ciudad de origen basada en la IP: {$origen}");
+        }
+
+        $origenAirport = DB::table('airports')
+            ->join('cities', 'airports.city_id', '=', 'cities.id')
+            ->where('cities.name', $origen)
+            ->first();
+
+        if (!$origenAirport) {
+            return redirect('/')->with('error', 'Aeropuerto de origen no encontrado.');
+        }
+
+        $destinoAirport = DB::table('airports')
+            ->join('cities', 'airports.city_id', '=', 'cities.id')
+            ->where('cities.name', $destino->city->name)
+            ->first();
+
+        if (!$destinoAirport) {
+            return redirect('/')->with('error', 'Aeropuerto de destino no encontrado.');
+        }
+
+        // Consultar vuelos disponibles para el origen y destino
+        $vuelos = DB::table('flights')
+            ->join('airports as origin', 'flights.origin_airport_id', '=', 'origin.id')
+            ->join('airports as destination', 'flights.destination_airport_id', '=', 'destination.id')
+            ->select(
+                'flights.id',
+                'flights.flight_date',
+                'flights.departure_time',
+                'flights.arrival_time',
+                'flights.base_price',
+                'flights.flight_number',
+                'flights.total_duration AS duracion',
+                'flights.stopovers_count AS escalas',
+                'origin.city_id as origin_city_id',
+                'destination.city_id as destination_city_id',
+                'origin.code_iata as origin_city_iata',  // Cambiado de iata_code a code_iata
+                'destination.code_iata as destination_city_iata'  // Cambiado de iata_code a code_iata
+            )
+            ->where('origin.city_id', $origenAirport->city_id)
+            ->where('destination.city_id', $destinoAirport->city_id)
+            ->get();
+
+
+
+        // Comprobar si hay vuelos disponibles y si cada vuelo tiene la propiedad 'flight_number'
+        foreach ($vuelos as $vuelo) {
+            if (!isset($vuelo->flight_number)) {
+                Log::warning("El vuelo con ID {$vuelo->id} no tiene número de vuelo.");
+                $vuelo->flight_number = 'Número de vuelo no disponible';
+            }
+        }
+
+        return view('popular-destinations.show', compact('destino', 'vuelos', 'origenAirport', 'destinoAirport'));
     }
 
-    // Registrar los detalles del destino encontrado
-    Log::info("Destino encontrado: " . $destino->city->name);
+    public function getFlightsByDate($fecha)
+    {
+        // Filtrar vuelos según la fecha seleccionada
+        $vuelos = DB::table('flights')
+            ->join('airports as origin', 'flights.origin_airport_id', '=', 'origin.id')
+            ->join('airports as destination', 'flights.destination_airport_id', '=', 'destination.id')
+            ->select(
+                'flights.id',
+                'flights.flight_date',
+                'flights.departure_time',
+                'flights.arrival_time',
+                'flights.base_price',
+                'flights.flight_number',
+                'flights.total_duration AS duracion',
+                'flights.stopovers_count AS escalas',
+                'origin.city_id as origin_city_id',
+                'destination.city_id as destination_city_id',
+                'origin.iata_code AS origin_city_iata',
+                'destination.iata_code AS destination_city_iata',
+                'airlines.logo_url AS airline_logo'
+            )
+            ->where('flights.flight_date', $fecha)
+            ->get();
 
-    // Obtener la IP del usuario
-    $ip = request()->ip();
-    Log::info("IP del usuario: {$ip}");
-
-    // Usar una API gratuita para obtener la ciudad basada en la IP
-    $url = "http://ip-api.com/json/{$ip}";
-    $response = file_get_contents($url);
-    $data = json_decode($response);
-
-    // Verificar si la ciudad de origen es válida
-    $origen = $data->city ?? 'Desconocida';
-    Log::info("Ciudad de origen basada en la IP: {$origen}");
-
-    // Obtener el aeropuerto de origen y destino usando el city_id y un JOIN con la tabla cities
-    $origenAirport = DB::table('airports')
-        ->join('cities', 'airports.city_id', '=', 'cities.id')
-        ->where('cities.name', $origen)  // Usamos 'name' de la tabla 'cities'
-        ->first();
-
-    if (!$origenAirport) {
-        // Registrar que no se encontró el aeropuerto de origen
-        Log::warning("No se encontró el aeropuerto de origen para la ciudad: {$origen}");
-        
-        // Si no se encuentra el aeropuerto de origen, manejar el error
-        return redirect('/')->with('error', 'Aeropuerto de origen no encontrado.');
+        return response()->json(['vuelos' => $vuelos]);
     }
 
-    Log::info("Aeropuerto de origen encontrado: {$origenAirport->name}");
 
-    $destinoAirport = DB::table('airports')
-        ->join('cities', 'airports.city_id', '=', 'cities.id')
-        ->where('cities.name', $destino->city->name)  // Usamos 'name' de la tabla 'cities'
-        ->first();
+    public function mostrarVuelos($fecha)
+    {
+        // Obtener los vuelos de la fecha seleccionada
+        $vuelos = Flight::where('flight_date', $fecha)
+            ->with('airline', 'origin.city', 'destination.city')
+            ->get();
 
-    if (!$destinoAirport) {
-        // Registrar que no se encontró el aeropuerto de destino
-        Log::warning("No se encontró el aeropuerto de destino para la ciudad: {$destino->city->name}");
-
-        // Si no se encuentra el aeropuerto de destino, manejar el error
-        return redirect('/')->with('error', 'Aeropuerto de destino no encontrado.');
+        // Devolver los vuelos en formato JSON
+        return response()->json(['vuelos' => $vuelos]);
     }
-
-    Log::info("Aeropuerto de destino encontrado: {$destinoAirport->name}");
-
-    // Consultar los vuelos disponibles desde la ciudad de origen hasta el destino
-    $vuelos = DB::table('flights')
-        ->join('airports as origin', 'flights.origin_airport_id', '=', 'origin.id')
-        ->join('airports as destination', 'flights.destination_airport_id', '=', 'destination.id')
-        ->where('origin.city_id', $origenAirport->city_id)  // Usamos el city_id de origen
-        ->where('destination.city_id', $destinoAirport->city_id)  // Usamos el city_id de destino
-        ->get();
-
-    // Verificar los vuelos encontrados
-    Log::info("Vuelos encontrados desde {$origenAirport->name} hacia {$destinoAirport->name}: " . $vuelos->count());
-
-    // Retornar la vista con los detalles del destino y los vuelos
-    return view('popular-destinations.show', compact('destino', 'vuelos'));
-}
-
-
 
 
     public function create()

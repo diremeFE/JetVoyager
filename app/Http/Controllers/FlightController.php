@@ -25,11 +25,15 @@ class FlightController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($flight_id, Request $request)
     {
-        $flight = Flight::findOrFail($id);
-        return response()->json($flight);
+        // Obtener el vuelo con sus relaciones, si es necesario
+        $flight = Flight::with(['originAirport', 'destinationAirport'])->findOrFail($flight_id);
+
+        // Pasar los datos a la vista
+        return view('flight.show', compact('flight'));
     }
+
 
     /**
      * Crear un nuevo vuelo.
