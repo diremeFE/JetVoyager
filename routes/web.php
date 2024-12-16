@@ -29,6 +29,8 @@ Route::get('popular-destinations', [PopularDestinationController::class, 'indexA
 Route::get('/popular-destinations/{city_id}', [PopularDestinationController::class, 'show'])->name('popular-destinations.show');
 Route::get('/vuelos/{fecha}', [PopularDestinationController::class, 'mostrarVuelos']);
 Route::get('/vuelo/{flight_id}', [FlightController::class, 'show'])->name('flight.show');
+Route::get('/flight/confirmar-vuelo/{flight}/{plan}', [FlightController::class, 'confirmarVuelo'])->name('flight.confirmar-vuelo');
+Route::get('/search-flights', [FlightController::class, 'search']);
 
 
 

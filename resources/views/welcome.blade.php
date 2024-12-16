@@ -1,6 +1,78 @@
 @extends('layouts.app') <!-- Aquí se extiende la plantilla base -->
 
 @section('content')
+<section class="h-64 bg-center bg-no-repeat bg-contain relative"
+style="background-image: url('{{ asset('storage/images/Logo-black.svg') }}');">
+<div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl">
+        <h2 class="text-2xl font-bold mb-4 text-center text-gray-800">Busca tu vuelo</h2>
+
+        <!-- Formulario de búsqueda de vuelos -->
+        <form class="grid grid-cols-1 md:grid-cols-4 gap-4" action="{{ url('/search-flights') }}" method="GET">
+
+            <!-- Opciones de solo ida o ida y vuelta -->
+            <div class="md:col-span-4 flex justify-center space-x-4">
+                <label class="flex items-center">
+                    <input type="radio" name="tipo_viaje" value="ida" class="mr-2" checked>
+                    Solo ida
+                </label>
+                <label class="flex items-center">
+                    <input type="radio" name="tipo_viaje" value="ida_vuelta" class="mr-2">
+                    Ida y vuelta
+                </label>
+            </div>
+
+            <!-- Campo de Origen -->
+            <div>
+                <label for="origin" class="block text-sm font-medium text-gray-700">Origen</label>
+                <select id="origin" name="origin" class="mt-1 block w-full rounded-md border-gray-300">
+                    <option value="">Ciudad de origen</option>
+                    <option value="MAD">Madrid (MAD)</option>
+                    <option value="BCN">Barcelona (BCN)</option>
+                    <option value="SVQ">Sevilla (SVQ)</option>
+                    <option value="VLC">Manises (VLC)</option>
+                </select>
+            </div>
+
+            <!-- Campo de Destino -->
+            <div>
+                <label for="destination" class="block text-sm font-medium text-gray-700">Destino</label>
+                <select id="destination" name="destination" class="mt-1 block w-full rounded-md border-gray-300">
+                    <option value="">Ciudad de destino</option>
+                    <option value="CDG">París (CDG)</option>
+                    <option value="LHR">Londres (LHR)</option>
+                    <option value="FCO">Roma (FCO)</option>
+                    <option value="VLC">Manises (VLC)</option>
+                </select>
+            </div>
+
+            <!-- Campo de Fecha de Salida -->
+            <div>
+                <label for="departure" class="block text-sm font-medium text-gray-700">Salida</label>
+                <input type="date" id="departure" name="departure"
+                    class="block w-full rounded-md border-gray-300">
+            </div>
+
+            <!-- Campo de Fecha de Regreso (solo se muestra si es "Ida y vuelta") -->
+            <div id="returnField">
+                <label for="return_date" class="block text-sm font-medium text-gray-700">Regreso</label>
+                <input type="date" id="return_date" name="return_date" class="block w-full rounded-md border-gray-300">
+            </div>
+
+            <!-- Botón de búsqueda -->
+            <div class="md:col-span-4">
+                <button type="submit" class="w-full py-2 px-4 bg-blue-600 text-white rounded-md">
+                    Buscar Vuelos
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+</section>
+
+
+
     <!-- DESTINOS POPULARES -->
     <section class="p-6 flex flex-col max-w-7xl mx-auto">
         <h2 class="text-4xl font-semibold mb-9">Destinos populares</h2>
@@ -67,3 +139,27 @@
         </div>
     </section>
 @endsection
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const tipoViajeRadios = document.querySelectorAll('input[name="tipo_viaje"]');
+    const returnField = document.getElementById('returnField');
+
+    tipoViajeRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            if (radio.value === 'ida') {
+                returnField.style.display = 'none';
+            } else {
+                returnField.style.display = 'block';
+            }
+        });
+    });
+
+    const tipoViajeSeleccionado = document.querySelector('input[name="tipo_viaje"]:checked');
+    if (tipoViajeSeleccionado && tipoViajeSeleccionado.value === 'ida') {
+        returnField.style.display = 'none';
+    }
+});
+
+</script>
